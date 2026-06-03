@@ -1,0 +1,1515 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>DriveFinance — Controle financeiro sem complicação</title>
+<meta name="description" content="Registre despesas, acompanhe receitas e tenha uma visão clara da sua vida financeira em qualquer lugar." />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,300;12..96,400;12..96,500;12..96,600;12..96,700;12..96,800&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;1,9..40,300&display=swap" rel="stylesheet" />
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg: #050816;
+    --card: #0B1220;
+    --card2: #0d1628;
+    --blue: #2563EB;
+    --purple: #7C3AED;
+    --text: #FFFFFF;
+    --muted: #A1A1AA;
+    --border: rgba(255,255,255,0.07);
+    --border-bright: rgba(255,255,255,0.12);
+    --font-head: 'Bricolage Grotesque', sans-serif;
+    --font-body: 'DM Sans', sans-serif;
+  }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--font-body);
+    font-size: 16px;
+    line-height: 1.6;
+    overflow-x: hidden;
+  }
+
+  /* ─── GRID BG ─── */
+  .grid-bg {
+    position: fixed;
+    inset: 0;
+    z-index: 0;
+    background-image:
+      linear-gradient(rgba(37,99,235,0.04) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(37,99,235,0.04) 1px, transparent 1px);
+    background-size: 60px 60px;
+    pointer-events: none;
+  }
+
+  /* ─── NAV ─── */
+  nav {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    z-index: 100;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 max(2rem, calc((100vw - 1200px)/2 + 2rem));
+    height: 64px;
+    background: rgba(5,8,22,0.8);
+    backdrop-filter: blur(20px);
+    border-bottom: 1px solid var(--border);
+  }
+
+  .nav-logo {
+    font-family: var(--font-head);
+    font-size: 1.2rem;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    color: var(--text);
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .nav-logo .logo-icon {
+    width: 32px; height: 32px;
+    background: linear-gradient(135deg, var(--blue), var(--purple));
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+    font-weight: 800;
+    color: #fff;
+    flex-shrink: 0;
+  }
+
+  .nav-links {
+    display: flex;
+    align-items: center;
+    gap: 2rem;
+    list-style: none;
+  }
+
+  .nav-links a {
+    color: var(--muted);
+    text-decoration: none;
+    font-size: 0.875rem;
+    transition: color .2s;
+  }
+  .nav-links a:hover { color: var(--text); }
+
+  .nav-cta {
+    background: linear-gradient(135deg, var(--blue), var(--purple));
+    color: #fff !important;
+    padding: 0.5rem 1.25rem;
+    border-radius: 8px;
+    font-weight: 500;
+    font-size: 0.875rem !important;
+    text-decoration: none;
+    transition: opacity .2s;
+  }
+  .nav-cta:hover { opacity: 0.85; }
+
+  .nav-logo {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    text-decoration: none;
+    color: white;
+    font-weight: 700;
+}
+
+.logo-icon {
+    width: 36px;
+    height: 36px;
+    object-fit: contain;
+}
+
+  /* ─── HERO ─── */
+  .hero {
+    position: relative;
+    z-index: 1;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 6rem 2rem 4rem;
+    overflow: hidden;
+  }
+
+  .hero-glow-blue {
+    position: absolute;
+    width: 700px; height: 700px;
+    background: radial-gradient(circle, rgba(37,99,235,0.18) 0%, transparent 70%);
+    top: -100px; left: -200px;
+    pointer-events: none;
+  }
+
+  .hero-glow-purple {
+    position: absolute;
+    width: 600px; height: 600px;
+    background: radial-gradient(circle, rgba(124,58,237,0.15) 0%, transparent 70%);
+    top: 50px; right: -150px;
+    pointer-events: none;
+  }
+
+  .hero-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 14px;
+    background: rgba(37,99,235,0.12);
+    border: 1px solid rgba(37,99,235,0.3);
+    border-radius: 100px;
+    font-size: 0.8rem;
+    font-weight: 500;
+    color: #93b4fc;
+    margin-bottom: 2rem;
+    animation: fadeInDown .6s ease both;
+  }
+
+  .hero h1 {
+    font-family: var(--font-head);
+    font-size: clamp(2.8rem, 7vw, 5.5rem);
+    font-weight: 800;
+    letter-spacing: -0.04em;
+    line-height: 1.05;
+    max-width: 800px;
+    animation: fadeInUp .7s .1s ease both;
+    background: linear-gradient(135deg, #fff 30%, rgba(255,255,255,0.6));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .hero p {
+    color: var(--muted);
+    font-size: clamp(1rem, 2vw, 1.2rem);
+    max-width: 540px;
+    margin: 1.5rem auto 2.5rem;
+    line-height: 1.7;
+    animation: fadeInUp .7s .2s ease both;
+  }
+
+  .hero-actions {
+    display: flex;
+    gap: 1rem;
+    flex-wrap: wrap;
+    justify-content: center;
+    animation: fadeInUp .7s .3s ease both;
+  }
+
+  .btn-primary {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 0.875rem 2rem;
+    background: linear-gradient(135deg, var(--blue) 0%, var(--purple) 100%);
+    color: #fff;
+    font-family: var(--font-body);
+    font-size: 0.95rem;
+    font-weight: 600;
+    border-radius: 10px;
+    text-decoration: none;
+    border: none;
+    cursor: pointer;
+    transition: all .2s;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .btn-primary::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: rgba(255,255,255,0);
+    transition: background .2s;
+  }
+  .btn-primary:hover::before { background: rgba(255,255,255,0.08); }
+  .btn-primary:active { transform: scale(0.98); }
+
+  .btn-secondary {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 0.875rem 2rem;
+    background: rgba(255,255,255,0.05);
+    color: #fff;
+    font-family: var(--font-body);
+    font-size: 0.95rem;
+    font-weight: 500;
+    border-radius: 10px;
+    text-decoration: none;
+    border: 1px solid var(--border-bright);
+    cursor: pointer;
+    transition: all .2s;
+  }
+  .btn-secondary:hover { background: rgba(255,255,255,0.09); border-color: rgba(255,255,255,0.2); }
+
+  /* ─── DASHBOARD HERO ─── */
+  .dashboard-wrapper {
+    position: relative;
+    z-index: 1;
+    width: 100%;
+    max-width: 1100px;
+    margin: 4rem auto 0;
+    padding: 0 2rem;
+    animation: fadeInUp .9s .4s ease both;
+  }
+
+  .dashboard-glow-wrap {
+    position: relative;
+  }
+
+  .dashboard-glow-wrap::before {
+    content: '';
+    position: absolute;
+    inset: -40px;
+    background: radial-gradient(ellipse at 50% 60%, rgba(37,99,235,0.15) 0%, rgba(124,58,237,0.1) 40%, transparent 70%);
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .dashboard {
+    position: relative;
+    z-index: 1;
+    background: var(--card);
+    border: 1px solid var(--border-bright);
+    border-radius: 20px;
+    overflow: hidden;
+    box-shadow:
+      0 0 0 1px rgba(37,99,235,0.08),
+      0 40px 80px rgba(0,0,0,0.6),
+      0 0 80px rgba(37,99,235,0.06);
+  }
+
+  .dashboard-topbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 14px 20px;
+    border-bottom: 1px solid var(--border);
+    background: rgba(255,255,255,0.02);
+  }
+
+  .dot-row {
+    display: flex;
+    gap: 6px;
+  }
+
+  .dot {
+    width: 10px; height: 10px;
+    border-radius: 50%;
+  }
+
+  .dot-r { background: #FF5F56; }
+  .dot-y { background: #FFBD2E; }
+  .dot-g { background: #27C93F; }
+
+  .db-title-bar {
+    font-size: 12px;
+    color: var(--muted);
+    letter-spacing: 0.04em;
+  }
+
+  .dashboard-inner {
+    display: grid;
+    grid-template-columns: 220px 1fr;
+    min-height: 480px;
+  }
+
+  .db-sidebar {
+    border-right: 1px solid var(--border);
+    padding: 1.5rem 1rem;
+    background: rgba(0,0,0,0.15);
+  }
+
+  .db-sidebar-logo {
+    font-family: var(--font-head);
+    font-weight: 700;
+    font-size: 0.95rem;
+    color: #fff;
+    margin-bottom: 1.5rem;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .db-sidebar-logo .mini-icon {
+    width: 24px; height: 24px;
+    background: linear-gradient(135deg, var(--blue), var(--purple));
+    border-radius: 6px;
+    flex-shrink: 0;
+  }
+
+  .db-nav-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 10px;
+    border-radius: 8px;
+    font-size: 0.82rem;
+    color: var(--muted);
+    margin-bottom: 2px;
+    cursor: pointer;
+    transition: all .15s;
+  }
+
+  .db-nav-item.active {
+    background: rgba(37,99,235,0.15);
+    color: #7ba8f8;
+    border: 1px solid rgba(37,99,235,0.25);
+  }
+
+  .db-nav-item .nav-dot {
+    width: 7px; height: 7px;
+    border-radius: 50%;
+    background: currentColor;
+    opacity: 0.6;
+    flex-shrink: 0;
+  }
+
+  .db-main {
+    padding: 1.5rem;
+    overflow: hidden;
+  }
+
+  .db-stats-row {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+    margin-bottom: 1.25rem;
+  }
+
+  .db-stat {
+    background: rgba(255,255,255,0.04);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 14px 16px;
+  }
+
+  .db-stat-label {
+    font-size: 11px;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    margin-bottom: 6px;
+  }
+
+  .db-stat-value {
+    font-family: var(--font-head);
+    font-size: 1.4rem;
+    font-weight: 700;
+    color: #fff;
+    letter-spacing: -0.02em;
+  }
+
+  .db-stat-delta {
+    font-size: 11px;
+    margin-top: 4px;
+    display: flex;
+    align-items: center;
+    gap: 3px;
+  }
+
+  .delta-up { color: #34D399; }
+  .delta-down { color: #F87171; }
+
+  .db-row2 {
+    display: grid;
+    grid-template-columns: 1.5fr 1fr;
+    gap: 12px;
+  }
+
+  .db-card {
+    background: rgba(255,255,255,0.03);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 14px 16px;
+    overflow: hidden;
+  }
+
+  .db-card-title {
+    font-size: 11px;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    margin-bottom: 12px;
+  }
+
+  .chart-bars {
+    display: flex;
+    align-items: flex-end;
+    gap: 6px;
+    height: 100px;
+  }
+
+  .chart-bar-wrap {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    flex: 1;
+  }
+
+  .chart-bar {
+    width: 100%;
+    border-radius: 4px 4px 0 0;
+    min-height: 4px;
+    transition: all .3s;
+  }
+
+  .chart-bar-label {
+    font-size: 9px;
+    color: var(--muted);
+    opacity: 0.7;
+  }
+
+  .expense-list { display: flex; flex-direction: column; gap: 8px; }
+
+  .expense-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+  }
+
+  .exp-icon {
+    width: 28px; height: 28px;
+    border-radius: 7px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 13px;
+    flex-shrink: 0;
+  }
+
+  .exp-name {
+    flex: 1;
+    font-size: 12px;
+    color: #ddd;
+  }
+
+  .exp-val {
+    font-size: 12px;
+    font-weight: 600;
+    font-family: var(--font-head);
+  }
+
+  /* ─── SECTION CONTAINER ─── */
+  .container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 2rem;
+  }
+
+  section {
+    position: relative;
+    z-index: 1;
+  }
+
+  /* ─── LOGOS STRIP ─── */
+  .logos-strip {
+    padding: 3rem 0;
+    border-top: 1px solid var(--border);
+    border-bottom: 1px solid var(--border);
+    overflow: hidden;
+  }
+
+  .logos-label {
+    text-align: center;
+    font-size: 0.75rem;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    margin-bottom: 1.5rem;
+  }
+
+  .logos-row {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 3rem;
+    flex-wrap: wrap;
+  }
+
+  .logo-pill {
+    font-family: var(--font-head);
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: rgba(255,255,255,0.2);
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+  }
+
+  /* ─── BENEFITS ─── */
+  .benefits {
+    padding: 7rem 0;
+  }
+
+  .section-eyebrow {
+    text-align: center;
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: #6d9cf8;
+    margin-bottom: 1rem;
+    font-weight: 600;
+  }
+
+  .section-title {
+    text-align: center;
+    font-family: var(--font-head);
+    font-size: clamp(2rem, 4vw, 3rem);
+    font-weight: 800;
+    letter-spacing: -0.03em;
+    line-height: 1.1;
+    margin-bottom: 1rem;
+    max-width: 600px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  .section-sub {
+    text-align: center;
+    color: var(--muted);
+    font-size: 1.05rem;
+    max-width: 480px;
+    margin: 0 auto 4rem;
+    line-height: 1.7;
+  }
+
+  .benefits-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 1.5rem;
+  }
+
+  .benefit-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 2rem;
+    position: relative;
+    overflow: hidden;
+    transition: border-color .25s, transform .25s;
+  }
+
+  .benefit-card:hover {
+    border-color: rgba(37,99,235,0.3);
+    transform: translateY(-4px);
+  }
+
+  .benefit-card::before {
+    content: '';
+    position: absolute;
+    top: -40px; right: -40px;
+    width: 150px; height: 150px;
+    border-radius: 50%;
+    opacity: 0;
+    transition: opacity .3s;
+    pointer-events: none;
+  }
+
+  .benefit-card:hover::before { opacity: 1; }
+
+  .benefit-card.c1::before { background: radial-gradient(circle, rgba(37,99,235,0.15), transparent 70%); }
+  .benefit-card.c2::before { background: radial-gradient(circle, rgba(124,58,237,0.15), transparent 70%); }
+  .benefit-card.c3::before { background: radial-gradient(circle, rgba(16,185,129,0.12), transparent 70%); }
+
+  .benefit-icon {
+    width: 48px; height: 48px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 22px;
+    margin-bottom: 1.25rem;
+  }
+
+  .ic-blue { background: rgba(37,99,235,0.15); }
+  .ic-purple { background: rgba(124,58,237,0.15); }
+  .ic-green { background: rgba(16,185,129,0.12); }
+
+  .benefit-card h3 {
+    font-family: var(--font-head);
+    font-size: 1.25rem;
+    font-weight: 700;
+    margin-bottom: 0.75rem;
+    letter-spacing: -0.02em;
+  }
+
+  .benefit-card p {
+    color: var(--muted);
+    font-size: 0.9rem;
+    line-height: 1.7;
+  }
+
+  /* ─── SCREENSHOTS ─── */
+  .screenshots {
+    padding: 5rem 0 7rem;
+    overflow: hidden;
+  }
+
+  .phones-row {
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+    gap: 1.5rem;
+    margin-top: 4rem;
+    flex-wrap: wrap;
+  }
+
+  .phone-mock {
+    width: 200px;
+    background: var(--card);
+    border: 1px solid var(--border-bright);
+    border-radius: 32px;
+    overflow: hidden;
+    position: relative;
+    transition: transform .3s;
+    box-shadow: 0 30px 60px rgba(0,0,0,0.5), 0 0 0 1px rgba(255,255,255,0.05);
+  }
+
+  .phone-mock:hover { transform: translateY(-8px) scale(1.02); }
+  .phone-mock.center { width: 220px; }
+
+  .phone-notch {
+    background: #000;
+    height: 28px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 8px 40px 0;
+    border-radius: 14px;
+  }
+
+  .notch-pill {
+    width: 60px; height: 10px;
+    background: #111;
+    border-radius: 5px;
+  }
+
+  .phone-screen {
+    padding: 16px 12px;
+    min-height: 380px;
+    background: #080f1e;
+  }
+
+  /* Tela 1: Home */
+  .screen-header {
+    font-family: var(--font-head);
+    font-size: 11px;
+    color: var(--muted);
+    margin-bottom: 12px;
+    letter-spacing: 0.03em;
+  }
+
+  .screen-balance {
+    font-family: var(--font-head);
+    font-size: 1.8rem;
+    font-weight: 800;
+    letter-spacing: -0.03em;
+    color: #fff;
+    line-height: 1;
+    margin-bottom: 4px;
+  }
+
+  .screen-label-sm {
+    font-size: 10px;
+    color: var(--muted);
+    margin-bottom: 16px;
+  }
+
+  .screen-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+    margin-bottom: 14px;
+  }
+
+  .screen-mini-card {
+    background: rgba(255,255,255,0.05);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 10px;
+  }
+
+  .smc-label { font-size: 9px; color: var(--muted); margin-bottom: 4px; }
+  .smc-value { font-family: var(--font-head); font-size: 0.9rem; font-weight: 700; }
+
+  .screen-bar-bg {
+    background: rgba(255,255,255,0.06);
+    border-radius: 4px;
+    height: 6px;
+    margin-top: 4px;
+    overflow: hidden;
+  }
+
+  .screen-bar-fill {
+    height: 100%;
+    border-radius: 4px;
+  }
+
+  .screen-entries { display: flex; flex-direction: column; gap: 6px; }
+
+  .screen-entry {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 7px 8px;
+    background: rgba(255,255,255,0.04);
+    border-radius: 8px;
+    border: 1px solid var(--border);
+  }
+
+  .se-left { display: flex; align-items: center; gap: 7px; }
+
+  .se-dot {
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+
+  .se-name { font-size: 10px; color: #ccc; }
+  .se-val { font-size: 10px; font-weight: 600; font-family: var(--font-head); }
+
+  /* Tela 2: Gráfico */
+  .screen-chart-area {
+    display: flex;
+    align-items: flex-end;
+    gap: 5px;
+    height: 100px;
+    margin-bottom: 12px;
+  }
+
+  .sc-bar-wrap { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 3px; }
+  .sc-bar { width: 100%; border-radius: 3px 3px 0 0; min-height: 3px; }
+  .sc-lbl { font-size: 8px; color: var(--muted); }
+
+  /* Tela 3: Manutenção */
+  .screen-maint-list { display: flex; flex-direction: column; gap: 7px; }
+
+  .sm-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px;
+    background: rgba(255,255,255,0.04);
+    border: 1px solid var(--border);
+    border-radius: 9px;
+  }
+
+  .sm-icon-box {
+    width: 28px; height: 28px;
+    border-radius: 7px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+    flex-shrink: 0;
+  }
+
+  .sm-info { flex: 1; min-width: 0; }
+  .sm-name { font-size: 10px; color: #ddd; font-weight: 500; }
+  .sm-date { font-size: 9px; color: var(--muted); }
+  .sm-cost { font-size: 10px; font-weight: 700; font-family: var(--font-head); }
+
+  /* ─── BETA ─── */
+  .beta-section { padding: 5rem 0; }
+
+  .beta-card {
+    background: var(--card);
+    border: 1px solid rgba(37,99,235,0.25);
+    border-radius: 20px;
+    padding: 3.5rem;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+    max-width: 700px;
+    margin: 0 auto;
+  }
+
+  .beta-card::before {
+    content: '';
+    position: absolute;
+    top: -80px; left: 50%;
+    transform: translateX(-50%);
+    width: 400px; height: 200px;
+    background: radial-gradient(ellipse, rgba(37,99,235,0.12), transparent 70%);
+    pointer-events: none;
+  }
+
+  .beta-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 5px 12px;
+    background: rgba(124,58,237,0.15);
+    border: 1px solid rgba(124,58,237,0.3);
+    border-radius: 100px;
+    font-size: 0.75rem;
+    color: #b89afc;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    margin-bottom: 1.5rem;
+  }
+
+  .beta-card h2 {
+    font-family: var(--font-head);
+    font-size: 2rem;
+    font-weight: 800;
+    letter-spacing: -0.03em;
+    margin-bottom: 1rem;
+  }
+
+  .beta-card p {
+    color: var(--muted);
+    max-width: 460px;
+    margin: 0 auto 2rem;
+    line-height: 1.7;
+    font-size: 0.95rem;
+  }
+
+  /* ─── FAQ ─── */
+  .faq { padding: 7rem 0; }
+
+  .faq-list {
+    max-width: 700px;
+    margin: 4rem auto 0;
+  }
+
+  .faq-item {
+    border-bottom: 1px solid var(--border);
+    overflow: hidden;
+  }
+
+  .faq-q {
+    width: 100%;
+    background: none;
+    border: none;
+    color: var(--text);
+    text-align: left;
+    font-family: var(--font-body);
+    font-size: 1rem;
+    font-weight: 500;
+    padding: 1.25rem 0;
+    cursor: pointer;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 1rem;
+    transition: color .2s;
+  }
+
+  .faq-q:hover { color: #93b4fc; }
+
+  .faq-arrow {
+    width: 18px; height: 18px;
+    border: 1px solid var(--border-bright);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    font-size: 12px;
+    transition: transform .25s;
+    color: var(--muted);
+  }
+
+  .faq-item.open .faq-arrow { transform: rotate(180deg); }
+
+  .faq-a {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height .3s ease, padding .3s;
+    color: var(--muted);
+    font-size: 0.9rem;
+    line-height: 1.7;
+  }
+
+  .faq-item.open .faq-a { max-height: 200px; padding-bottom: 1.25rem; }
+
+  /* ─── FOOTER ─── */
+  footer {
+    position: relative;
+    z-index: 1;
+    border-top: 1px solid var(--border);
+    padding: 2.5rem 0;
+  }
+
+  .footer-inner {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 1rem;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 2rem;
+  }
+
+  .footer-logo {
+    font-family: var(--font-head);
+    font-weight: 700;
+    font-size: 1rem;
+    color: #fff;
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .footer-mini-icon {
+    width: 22px; height: 22px;
+    background: linear-gradient(135deg, var(--blue), var(--purple));
+    border-radius: 5px;
+  }
+
+  .footer-copy {
+    color: var(--muted);
+    font-size: 0.82rem;
+  }
+
+  .footer-links {
+    display: flex;
+    gap: 1.5rem;
+    list-style: none;
+    flex-wrap: wrap;
+  }
+
+  .footer-links a {
+    color: var(--muted);
+    font-size: 0.82rem;
+    text-decoration: none;
+    transition: color .2s;
+  }
+  .footer-links a:hover { color: var(--text); }
+
+  .footer-logo { display: flex; align-items: center; gap: 10px; }
+
+.footer-logo-icon { width: 28px; height: 28px; object-fit: contain; }
+
+  /* ─── ANIMATIONS ─── */
+  @keyframes fadeInDown {
+    from { opacity: 0; transform: translateY(-16px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  @keyframes fadeInUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  @keyframes float {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-10px); }
+  }
+
+  .float-anim { animation: float 5s ease-in-out infinite; }
+  .float-anim-slow { animation: float 7s ease-in-out infinite; }
+
+  /* scroll reveal */
+  .reveal {
+    opacity: 0;
+    transform: translateY(30px);
+    transition: opacity .7s ease, transform .7s ease;
+  }
+
+  .reveal.visible {
+    opacity: 1;
+    transform: none;
+  }
+
+  /* ─── RESPONSIVE ─── */
+  @media (max-width: 900px) {
+    .dashboard-inner { grid-template-columns: 1fr; }
+    .db-sidebar { display: none; }
+    .db-stats-row { grid-template-columns: repeat(3, 1fr); }
+  }
+
+  @media (max-width: 640px) {
+    .nav-links { display: none; }
+    .db-row2 { grid-template-columns: 1fr; }
+    .db-stats-row { grid-template-columns: repeat(3, 1fr); }
+    .phone-mock { width: 160px; }
+    .phone-mock.center { width: 180px; }
+    .footer-inner { flex-direction: column; align-items: center; text-align: center; }
+    .beta-card { padding: 2rem 1.5rem; }
+  }
+
+  /* line deco */
+  .line-deco {
+    position: absolute;
+    pointer-events: none;
+    z-index: 0;
+  }
+</style>
+</head>
+<body>
+
+<div class="grid-bg"></div>
+
+<!-- NAV -->
+<nav>
+  <a href="#" class="nav-logo">
+  <img src="images/icon.png" alt="DriveFinance" class="logo-icon">
+    DriveFinance
+  </a>
+  <ul class="nav-links">
+    <li><a href="#recursos">Recursos</a></li>
+    <li><a href="#screenshots">Screenshots</a></li>
+    <li><a href="#faq">FAQ</a></li>
+    <li><a href="#beta" class="nav-cta">Baixar APK</a></li>
+  </ul>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-glow-blue"></div>
+  <div class="hero-glow-purple"></div>
+
+  <div class="hero-badge">🚀 Beta disponível</div>
+
+  <h1>Controle financeiro<br/>sem complicação.</h1>
+
+  <p>Registre despesas, acompanhe receitas e tenha uma visão clara da sua vida financeira em qualquer lugar.</p>
+
+  <div class="hero-actions">
+    <a href="#" class="btn-primary" id="apk-btn-hero">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+      Baixar APK
+    </a>
+    <a href="#recursos" class="btn-secondary">
+      Ver Recursos
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+    </a>
+  </div>
+</section>
+
+<!-- DASHBOARD HERO -->
+<div class="dashboard-wrapper float-anim-slow" style="margin-top:-2rem;">
+  <div class="dashboard-glow-wrap">
+    <div class="dashboard">
+      <div class="dashboard-topbar">
+        <div class="dot-row">
+          <div class="dot dot-r"></div>
+          <div class="dot dot-y"></div>
+          <div class="dot dot-g"></div>
+        </div>
+        <div class="db-title-bar">DriveFinance — Dashboard</div>
+        <div style="font-size:11px;color:var(--muted);">Jun 2026</div>
+      </div>
+
+      <div class="dashboard-inner">
+        <!-- Sidebar -->
+        <div class="db-sidebar">
+          <div class="db-sidebar-logo">
+            <div class="mini-icon"></div>
+            DriveFinance
+          </div>
+
+          <div class="db-nav-item active">
+            <span class="nav-dot"></span> Dashboard
+          </div>
+          <div class="db-nav-item">
+            <span class="nav-dot"></span> Corridas
+          </div>
+          <div class="db-nav-item">
+            <span class="nav-dot"></span> Despesas
+          </div>
+          <div class="db-nav-item">
+            <span class="nav-dot"></span> Manutenção
+          </div>
+          <div class="db-nav-item">
+            <span class="nav-dot"></span> Relatórios
+          </div>
+
+          <div style="margin-top:1.5rem;padding-top:1.5rem;border-top:1px solid var(--border);">
+            <div style="font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:.75rem;">Resumo Rápido</div>
+            <div style="font-family:var(--font-head);font-size:1.6rem;font-weight:800;color:#fff;letter-spacing:-0.02em;">R$4.280</div>
+            <div style="font-size:10px;color:#34D399;margin-top:2px;">↑ 12% este mês</div>
+          </div>
+        </div>
+
+        <!-- Main -->
+        <div class="db-main">
+          <!-- Stats -->
+          <div class="db-stats-row">
+            <div class="db-stat">
+              <div class="db-stat-label">Receita Total</div>
+              <div class="db-stat-value">R$8.640</div>
+              <div class="db-stat-delta delta-up">↑ 8,4% mês ant.</div>
+            </div>
+            <div class="db-stat">
+              <div class="db-stat-label">Despesas</div>
+              <div class="db-stat-value">R$4.360</div>
+              <div class="db-stat-delta delta-down">↑ 3,1% mês ant.</div>
+            </div>
+            <div class="db-stat">
+              <div class="db-stat-label">Lucro Líquido</div>
+              <div class="db-stat-value" style="background:linear-gradient(135deg,#60a5fa,#a78bfa);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;">R$4.280</div>
+              <div class="db-stat-delta delta-up">↑ 12% mês ant.</div>
+            </div>
+          </div>
+
+          <!-- Charts row -->
+          <div class="db-row2">
+            <!-- Bar chart -->
+            <div class="db-card">
+              <div class="db-card-title">Evolução Mensal — Receita vs Despesa</div>
+              <div class="chart-bars">
+                <div class="chart-bar-wrap">
+                  <div class="chart-bar" style="height:55px;background:rgba(37,99,235,0.5);"></div>
+                  <div class="chart-bar" style="height:40px;background:rgba(124,58,237,0.4);margin-top:3px;"></div>
+                  <div class="chart-bar-label">Jan</div>
+                </div>
+                <div class="chart-bar-wrap">
+                  <div class="chart-bar" style="height:65px;background:rgba(37,99,235,0.55);"></div>
+                  <div class="chart-bar" style="height:38px;background:rgba(124,58,237,0.4);margin-top:3px;"></div>
+                  <div class="chart-bar-label">Fev</div>
+                </div>
+                <div class="chart-bar-wrap">
+                  <div class="chart-bar" style="height:72px;background:rgba(37,99,235,0.6);"></div>
+                  <div class="chart-bar" style="height:45px;background:rgba(124,58,237,0.4);margin-top:3px;"></div>
+                  <div class="chart-bar-label">Mar</div>
+                </div>
+                <div class="chart-bar-wrap">
+                  <div class="chart-bar" style="height:60px;background:rgba(37,99,235,0.55);"></div>
+                  <div class="chart-bar" style="height:50px;background:rgba(124,58,237,0.45);margin-top:3px;"></div>
+                  <div class="chart-bar-label">Abr</div>
+                </div>
+                <div class="chart-bar-wrap">
+                  <div class="chart-bar" style="height:80px;background:rgba(37,99,235,0.65);"></div>
+                  <div class="chart-bar" style="height:42px;background:rgba(124,58,237,0.4);margin-top:3px;"></div>
+                  <div class="chart-bar-label">Mai</div>
+                </div>
+                <div class="chart-bar-wrap">
+                  <div class="chart-bar" style="height:95px;background:linear-gradient(180deg,#3b82f6,#2563EB);"></div>
+                  <div class="chart-bar" style="height:48px;background:rgba(124,58,237,0.5);margin-top:3px;"></div>
+                  <div class="chart-bar-label" style="color:#60a5fa;">Jun</div>
+                </div>
+              </div>
+              <div style="display:flex;gap:1rem;margin-top:10px;">
+                <div style="display:flex;align-items:center;gap:5px;font-size:10px;color:var(--muted);">
+                  <div style="width:8px;height:8px;border-radius:2px;background:rgba(37,99,235,0.7);"></div> Receita
+                </div>
+                <div style="display:flex;align-items:center;gap:5px;font-size:10px;color:var(--muted);">
+                  <div style="width:8px;height:8px;border-radius:2px;background:rgba(124,58,237,0.6);"></div> Despesa
+                </div>
+              </div>
+            </div>
+
+            <!-- Expense breakdown -->
+            <div class="db-card">
+              <div class="db-card-title">Despesas por Categoria</div>
+              <div class="expense-list">
+                <div class="expense-item">
+                  <div class="exp-icon" style="background:rgba(239,68,68,0.15);">⛽</div>
+                  <div class="exp-name">Combustível</div>
+                  <div class="exp-val" style="color:#f87171;">R$1.840</div>
+                </div>
+                <div class="expense-item">
+                  <div class="exp-icon" style="background:rgba(245,158,11,0.15);">🔧</div>
+                  <div class="exp-name">Manutenção</div>
+                  <div class="exp-val" style="color:#fbbf24;">R$980</div>
+                </div>
+                <div class="expense-item">
+                  <div class="exp-icon" style="background:rgba(37,99,235,0.15);">🛡️</div>
+                  <div class="exp-name">Seguro</div>
+                  <div class="exp-val" style="color:#60a5fa;">R$890</div>
+                </div>
+                <div class="expense-item">
+                  <div class="exp-icon" style="background:rgba(124,58,237,0.15);">📱</div>
+                  <div class="exp-name">Apps / Outros</div>
+                  <div class="exp-val" style="color:#a78bfa;">R$650</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- LOGOS STRIP -->
+<div class="logos-strip" style="margin-top:5rem;position:relative;z-index:1;">
+  <div class="logos-label">Compatível com as principais plataformas</div>
+  <div class="logos-row">
+    <div class="logo-pill">Uber</div>
+    <div class="logo-pill">99</div>
+    <div class="logo-pill">inDriver</div>
+    <div class="logo-pill">iFood</div>
+    <div class="logo-pill">99Food</div>
+  </div>
+</div>
+
+<!-- BENEFITS -->
+<section class="benefits reveal" id="recursos">
+  <div class="container">
+    <div class="section-eyebrow">Benefícios</div>
+    <h2 class="section-title">Tudo que você precisa para crescer financeiramente</h2>
+    <p class="section-sub">Uma ferramenta simples com inteligência por trás. Feita para quem vive do volante.</p>
+
+    <div class="benefits-grid">
+      <div class="benefit-card c1">
+        <div class="benefit-icon ic-blue">📊</div>
+        <h3>Controle Total</h3>
+        <p>Tenha visão completa das suas finanças. Registre cada corrida, abastecimento e manutenção em segundos, sem complicação.</p>
+      </div>
+      <div class="benefit-card c2">
+        <div class="benefit-icon ic-purple">🧠</div>
+        <h3>Acompanhamento Inteligente</h3>
+        <p>Entenda exatamente para onde seu dinheiro está indo. Gráficos claros e categorias automáticas revelam seus padrões.</p>
+      </div>
+      <div class="benefit-card c3">
+        <div class="benefit-icon ic-green">📈</div>
+        <h3>Crescimento Financeiro</h3>
+        <p>Acompanhe sua evolução mês a mês. Compare períodos, identifique tendências e tome decisões mais inteligentes.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- SCREENSHOTS -->
+<section class="screenshots reveal" id="screenshots">
+  <div class="container">
+    <div class="section-eyebrow">Interface</div>
+    <h2 class="section-title">Pensado para o seu dia a dia</h2>
+    <p class="section-sub">Design limpo, rápido e funcional. Acesse o que precisa em poucos toques.</p>
+  </div>
+
+  <div class="phones-row">
+    <!-- Phone 1: Home -->
+    <div class="phone-mock float-anim" style="animation-delay:.3s;">
+      <div class="phone-notch"><div class="notch-pill"></div></div>
+      <div class="phone-screen">
+        <div class="screen-header">Olá, motorista 👋</div>
+        <div class="screen-balance">R$ 4.280</div>
+        <div class="screen-label-sm">Lucro Líquido · Junho</div>
+
+        <div class="screen-row">
+          <div class="screen-mini-card">
+            <div class="smc-label">Receita</div>
+            <div class="smc-value" style="color:#34D399;">R$8.640</div>
+            <div class="screen-bar-bg"><div class="screen-bar-fill" style="width:72%;background:linear-gradient(90deg,#34D399,#10B981);"></div></div>
+          </div>
+          <div class="screen-mini-card">
+            <div class="smc-label">Despesas</div>
+            <div class="smc-value" style="color:#F87171;">R$4.360</div>
+            <div class="screen-bar-bg"><div class="screen-bar-fill" style="width:45%;background:linear-gradient(90deg,#F87171,#EF4444);"></div></div>
+          </div>
+        </div>
+
+        <div style="font-size:10px;color:var(--muted);margin-bottom:7px;text-transform:uppercase;letter-spacing:.06em;">Últimos registros</div>
+        <div class="screen-entries">
+          <div class="screen-entry">
+            <div class="se-left"><div class="se-dot" style="background:#34D399;"></div><div class="se-name">Corrida Uber</div></div>
+            <div class="se-val" style="color:#34D399;">+R$45,20</div>
+          </div>
+          <div class="screen-entry">
+            <div class="se-left"><div class="se-dot" style="background:#F87171;"></div><div class="se-name">Combustível</div></div>
+            <div class="se-val" style="color:#F87171;">-R$120,00</div>
+          </div>
+          <div class="screen-entry">
+            <div class="se-left"><div class="se-dot" style="background:#34D399;"></div><div class="se-name">Corrida 99</div></div>
+            <div class="se-val" style="color:#34D399;">+R$38,50</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Phone 2: Chart (centro) -->
+    <div class="phone-mock center float-anim" style="animation-delay:.1s;">
+      <div class="phone-notch"><div class="notch-pill"></div></div>
+      <div class="phone-screen" style="padding:16px 12px;">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
+          <div style="font-family:var(--font-head);font-weight:700;font-size:.95rem;">Relatório</div>
+          <div style="font-size:10px;color:#60a5fa;background:rgba(37,99,235,0.15);padding:3px 8px;border-radius:6px;">Junho</div>
+        </div>
+        <div style="font-family:var(--font-head);font-size:1.5rem;font-weight:800;letter-spacing:-.02em;background:linear-gradient(135deg,#60a5fa,#a78bfa);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin-bottom:2px;">R$4.280</div>
+        <div style="font-size:10px;color:#34D399;margin-bottom:14px;">↑ 12% vs maio</div>
+
+        <div class="screen-chart-area">
+          <div class="sc-bar-wrap"><div class="sc-bar" style="height:55px;background:rgba(37,99,235,0.5);"></div><div class="sc-lbl">Jan</div></div>
+          <div class="sc-bar-wrap"><div class="sc-bar" style="height:65px;background:rgba(37,99,235,0.55);"></div><div class="sc-lbl">Fev</div></div>
+          <div class="sc-bar-wrap"><div class="sc-bar" style="height:72px;background:rgba(37,99,235,0.6);"></div><div class="sc-lbl">Mar</div></div>
+          <div class="sc-bar-wrap"><div class="sc-bar" style="height:60px;background:rgba(37,99,235,0.55);"></div><div class="sc-lbl">Abr</div></div>
+          <div class="sc-bar-wrap"><div class="sc-bar" style="height:80px;background:rgba(37,99,235,0.65);"></div><div class="sc-lbl">Mai</div></div>
+          <div class="sc-bar-wrap"><div class="sc-bar" style="height:96px;background:linear-gradient(180deg,#60a5fa,#2563EB);"></div><div class="sc-lbl" style="color:#60a5fa;">Jun</div></div>
+        </div>
+
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:7px;margin-top:10px;">
+          <div class="screen-mini-card">
+            <div class="smc-label">Corridas</div>
+            <div class="smc-value" style="font-size:1.1rem;color:#fff;">247</div>
+          </div>
+          <div class="screen-mini-card">
+            <div class="smc-label">Média/dia</div>
+            <div class="smc-value" style="font-size:1rem;color:#60a5fa;">R$142</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Phone 3: Manutenção -->
+    <div class="phone-mock float-anim" style="animation-delay:.5s;">
+      <div class="phone-notch"><div class="notch-pill"></div></div>
+      <div class="phone-screen">
+        <div style="font-family:var(--font-head);font-weight:700;font-size:.95rem;margin-bottom:4px;">Manutenção</div>
+        <div style="font-size:10px;color:var(--muted);margin-bottom:14px;">Controle de custos do veículo</div>
+
+        <div class="screen-mini-card" style="margin-bottom:12px;background:rgba(245,158,11,0.08);border-color:rgba(245,158,11,0.2);">
+          <div class="smc-label">Total Gasto em 2026</div>
+          <div class="smc-value" style="font-size:1.3rem;color:#fbbf24;">R$3.240</div>
+        </div>
+
+        <div style="font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:7px;">Histórico</div>
+
+        <div class="screen-maint-list">
+          <div class="sm-item">
+            <div class="sm-icon-box" style="background:rgba(245,158,11,0.15);">🔧</div>
+            <div class="sm-info">
+              <div class="sm-name">Revisão 10.000 km</div>
+              <div class="sm-date">15/05/2026</div>
+            </div>
+            <div class="sm-cost" style="color:#fbbf24;">R$780</div>
+          </div>
+          <div class="sm-item">
+            <div class="sm-icon-box" style="background:rgba(239,68,68,0.12);">🔴</div>
+            <div class="sm-info">
+              <div class="sm-name">Pastilhas de freio</div>
+              <div class="sm-date">02/04/2026</div>
+            </div>
+            <div class="sm-cost" style="color:#f87171;">R$450</div>
+          </div>
+          <div class="sm-item">
+            <div class="sm-icon-box" style="background:rgba(37,99,235,0.12);">💧</div>
+            <div class="sm-info">
+              <div class="sm-name">Troca de óleo</div>
+              <div class="sm-date">10/03/2026</div>
+            </div>
+            <div class="sm-cost" style="color:#60a5fa;">R$220</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- BETA -->
+<section class="beta-section reveal" id="beta">
+  <div class="container">
+    <div class="beta-card">
+      <div class="beta-badge">⚡ Beta Aberto</div>
+      <h2>DriveFinance está em fase beta.</h2>
+      <p>Estamos trabalhando constantemente para entregar a melhor experiência possível. Seu feedback é essencial para essa evolução.</p>
+      <a href="#" class="btn-primary" style="display:inline-flex;font-size:1rem;" id="apk-btn-beta">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+        Baixar APK Grátis
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- FAQ -->
+<section class="faq reveal" id="faq">
+  <div class="container">
+    <div class="section-eyebrow">FAQ</div>
+    <h2 class="section-title">Perguntas frequentes</h2>
+
+    <div class="faq-list">
+      <div class="faq-item open">
+        <button class="faq-q" onclick="toggleFaq(this)">
+          O aplicativo é gratuito?
+          <span class="faq-arrow">▾</span>
+        </button>
+        <div class="faq-a">Sim, o DriveFinance é completamente gratuito. Todas as funcionalidades principais estão disponíveis sem nenhum custo durante o período beta.</div>
+      </div>
+
+      <div class="faq-item">
+        <button class="faq-q" onclick="toggleFaq(this)">
+          Preciso de internet para usar?
+          <span class="faq-arrow">▾</span>
+        </button>
+        <div class="faq-a">Grande parte dos recursos funciona normalmente sem conexão com a internet. O sincronização automática acontece quando você se conectar novamente.</div>
+      </div>
+
+      <div class="faq-item">
+        <button class="faq-q" onclick="toggleFaq(this)">
+          Quando estará na Play Store?
+          <span class="faq-arrow">▾</span>
+        </button>
+        <div class="faq-a">Estamos finalizando os testes e ajustes antes da publicação oficial na Google Play Store. Por enquanto, o aplicativo está disponível via APK direto.</div>
+      </div>
+
+      <div class="faq-item">
+        <button class="faq-q" onclick="toggleFaq(this)">
+          Meus dados são seguros?
+          <span class="faq-arrow">▾</span>
+        </button>
+        <div class="faq-a">Seus dados são armazenados de forma segura no Firebase e protegidos com autenticação Google. Você tem controle total sobre suas informações.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-inner">
+    <a href="#" class="footer-logo">
+      <img src="images/icon.png" alt="DriveFinance" class="footer-logo-icon">
+      <span>DriveFinance</span>
+    </a>
+    <div class="footer-copy">© 2026 DriveFinance. Todos os direitos reservados.</div>
+    <ul class="footer-links">
+      <li><a href="#">Política de Privacidade</a></li>
+      <li><a href="#">Termos de Uso</a></li>
+      <li><a href="#">Contato</a></li>
+    </ul>
+  </div>
+</footer>
+
+<script>
+  // FAQ toggle
+  function toggleFaq(btn) {
+    const item = btn.closest('.faq-item');
+    const isOpen = item.classList.contains('open');
+    document.querySelectorAll('.faq-item').forEach(i => i.classList.remove('open'));
+    if (!isOpen) item.classList.add('open');
+  }
+
+  // Scroll reveal
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        e.target.classList.add('visible');
+        observer.unobserve(e.target);
+      }
+    });
+  }, { threshold: 0.12 });
+
+  document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+
+  // APK button placeholder
+  document.querySelectorAll('#apk-btn-hero, #apk-btn-beta').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      e.preventDefault();
+      btn.textContent = '⏳ Em breve...';
+      setTimeout(() => {
+        btn.innerHTML = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg> Baixar APK`;
+      }, 2000);
+    });
+  });
+</script>
+</body>
+</html>
